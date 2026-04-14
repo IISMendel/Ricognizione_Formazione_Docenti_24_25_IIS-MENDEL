@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ricognizione Formazione Docenti – A.S. 2024/25 | IIS Mendel</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0d0d;
+    --surface: #161616;
+    --surface2: #1e1e1e;
+    --border: #2a2a2a;
+    --gold: #c9a84c;
+    --gold-light: #e8c96d;
+    --green: #2d5a27;
+    --green-light: #4a8a43;
+    --text: #e8e2d6;
+    --muted: #888;
+    --red: #c0392b;
+    --blue: #2980b9;
+    --purple: #8e44ad;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: linear-gradient(135deg, #0d1a0c 0%, #111 50%, #1a1200 100%);
+    border-bottom: 2px solid var(--gold);
+    padding: 48px 40px 36px;
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 300px; height: 300px;
+    background: radial-gradient(circle, rgba(201,168,76,0.08) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  header .label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 10px;
+  }
+  header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(24px, 4vw, 40px);
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.2;
+    margin-bottom: 8px;
+  }
+  header p {
+    color: var(--muted);
+    font-size: 14px;
+  }
+
+  /* ── LAYOUT ── */
+  .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+
+  /* ── STATS BANNER ── */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    margin: 32px 0;
+  }
+  .stat-box {
+    background: var(--surface);
+    padding: 24px 20px;
+    text-align: center;
+  }
+  .stat-box .num {
+    font-family: 'Playfair Display', serif;
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--gold);
+    display: block;
+  }
+  .stat-box .desc {
+    font-size: 12px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 4px;
+  }
+
+  /* ── FILTERS ── */
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 24px;
+    align-items: center;
+  }
+  .filters input {
+    flex: 1;
+    min-width: 220px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 10px 16px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    border-radius: 4px;
+    outline: none;
+    transition: border-color .2s;
+  }
+  .filters input:focus { border-color: var(--gold); }
+  .filters input::placeholder { color: var(--muted); }
+
+  .btn-group { display: flex; gap: 6px; flex-wrap: wrap; }
+  .filter-btn {
+    padding: 8px 14px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all .2s;
+    white-space: nowrap;
+  }
+  .filter-btn:hover, .filter-btn.active {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: #000;
+  }
+
+  .sort-select {
+    padding: 8px 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    border-radius: 4px;
+    cursor: pointer;
+    outline: none;
+  }
+
+  /* ── TEACHER CARDS ── */
+  #docenti-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 48px; }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+    transition: border-color .2s;
+  }
+  .card:hover { border-color: #3a3a3a; }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 22px;
+    cursor: pointer;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .card-header:hover { background: var(--surface2); }
+
+  .teacher-info { flex: 1; min-width: 200px; }
+  .teacher-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 17px;
+    font-weight: 600;
+    color: #fff;
+  }
+  .teacher-meta {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 2px;
+    font-family: 'DM Mono', monospace;
+  }
+
+  .hours-badge {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+  .hours-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--gold);
+    line-height: 1;
+  }
+  .hours-label {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .bar-container {
+    width: 140px;
+    flex-shrink: 0;
+  }
+  .bar-track {
+    background: var(--border);
+    height: 6px;
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    background: linear-gradient(90deg, var(--green), var(--gold));
+    transition: width .4s ease;
+  }
+
+  .chevron {
+    color: var(--muted);
+    font-size: 18px;
+    transition: transform .3s;
+    flex-shrink: 0;
+  }
+  .card.open .chevron { transform: rotate(180deg); }
+
+  .card-body {
+    display: none;
+    padding: 0 22px 20px;
+    border-top: 1px solid var(--border);
+  }
+  .card.open .card-body { display: block; }
+
+  .courses-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 14px;
+    font-size: 13px;
+  }
+  .courses-table th {
+    text-align: left;
+    font-weight: 600;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--muted);
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .courses-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid #1f1f1f;
+    vertical-align: top;
+    color: var(--text);
+  }
+  .courses-table tr:last-child td { border-bottom: none; }
+  .courses-table tr:hover td { background: var(--surface2); }
+
+  .tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-size: 10px;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: .5px;
+    white-space: nowrap;
+    font-weight: 500;
+  }
+  .tag-dm66 { background: rgba(41,128,185,0.2); color: #6bb3d8; border: 1px solid rgba(41,128,185,0.3); }
+  .tag-dm65 { background: rgba(142,68,173,0.2); color: #c39bd3; border: 1px solid rgba(142,68,173,0.3); }
+  .tag-ext  { background: rgba(45,90,39,0.3); color: var(--green-light); border: 1px solid rgba(45,90,39,0.5); }
+
+  .ore-cell {
+    font-family: 'DM Mono', monospace;
+    font-weight: 500;
+    color: var(--gold);
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  .no-course {
+    padding: 16px 0;
+    color: var(--muted);
+    font-style: italic;
+    font-size: 13px;
+  }
+
+  /* ── ZERO BADGE ── */
+  .hours-num.zero { color: var(--muted); font-size: 20px; }
+
+  /* ── SECTION TITLE ── */
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    color: #fff;
+    margin-bottom: 6px;
+  }
+  .section-sub {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 20px;
+  }
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 32px 0;
+  }
+
+  /* ── CLASSIFICA ── */
+  .ranking { display: flex; flex-direction: column; gap: 6px; margin-bottom: 40px; }
+  .rank-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 12px 18px;
+    border-radius: 4px;
+    font-size: 14px;
+  }
+  .rank-pos {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    width: 24px;
+    flex-shrink: 0;
+  }
+  .rank-pos.top { color: var(--gold); font-weight: 600; }
+  .rank-name { flex: 1; color: var(--text); }
+  .rank-ore {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    color: var(--gold);
+    font-size: 18px;
+  }
+  .rank-bar-wrap { width: 160px; }
+
+  /* ── FOOTER ── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 20px 24px;
+    text-align: center;
+    color: var(--muted);
+    font-size: 12px;
+    font-family: 'DM Mono', monospace;
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 640px) {
+    header { padding: 32px 20px 24px; }
+    .bar-container { display: none; }
+    .hours-num { font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="label">IIS Gregorio Mendel – Villa Cortese (MI)</div>
+    <h1>Ricognizione Formazione Docenti</h1>
+    <p>Anno Scolastico 2024/25 &nbsp;·&nbsp; Analisi percorsi formativi per docente</p>
+  </div>
+</header>
+
+<div class="container" style="padding-top:32px;">
+
+  <!-- STATS -->
+  <div class="stats-grid">
+    <div class="stat-box">
+      <span class="num">65</span>
+      <span class="desc">Docenti rispondenti</span>
+    </div>
+    <div class="stat-box">
+      <span class="num">55</span>
+      <span class="desc">Con almeno 1 corso</span>
+    </div>
+    <div class="stat-box">
+      <span class="num">10</span>
+      <span class="desc">Senza corsi dichiarati</span>
+    </div>
+    <div class="stat-box">
+      <span class="num">2.659</span>
+      <span class="desc">Ore totali istituto</span>
+    </div>
+    <div class="stat-box">
+      <span class="num">48,3</span>
+      <span class="desc">Media ore/docente (con corsi)</span>
+    </div>
+    <div class="stat-box">
+      <span class="num">40,9</span>
+      <span class="desc">Media ore/docente (tutti)</span>
+    </div>
+  </div>
+
+  <!-- TOP 10 CLASSIFICA -->
+  <h2 class="section-title">🏆 Classifica — Top 10 per ore formazionali</h2>
+  <p class="section-sub">I docenti con il maggior numero di ore di formazione documentate</p>
+  <div class="ranking" id="ranking"></div>
+
+  <hr class="divider">
+
+  <!-- DOCENTI FILTERS -->
+  <h2 class="section-title">📋 Schede per docente</h2>
+  <p class="section-sub">Clicca su un docente per espandere il dettaglio dei corsi</p>
+
+  <div class="filters">
+    <input type="text" id="search" placeholder="🔍  Cerca per nome, classe di concorso, corso...">
+    <div class="btn-group">
+      <button class="filter-btn active" data-filter="all">Tutti</button>
+      <button class="filter-btn" data-filter="dm66">DM 66/2023</button>
+      <button class="filter-btn" data-filter="dm65">DM 65/2023</button>
+      <button class="filter-btn" data-filter="ext">Ente esterno</button>
+      <button class="filter-btn" data-filter="zero">Nessun corso</button>
+    </div>
+    <select class="sort-select" id="sort">
+      <option value="alpha">A → Z</option>
+      <option value="ore-desc">Ore (↓)</option>
+      <option value="ore-asc">Ore (↑)</option>
+    </select>
+  </div>
+
+  <div id="docenti-list"></div>
+
+</div>
+
+<footer>
+  IIS Gregorio Mendel &nbsp;|&nbsp; Ufficio coordinamento didattico &nbsp;|&nbsp; A.S. 2024/25
+</footer>
+
+<script>
+const MAX_ORE = 187;
+
+const docenti = [
+  {
+    nome: "Albè Franco", cdc: "A051", ore: 71,
+    corsi: [
+      {tipo:"DM 66/2023", nome:"Fondamenti dell'Intelligenza Artificiale per Insegnanti e Studenti", ore:14},
+      {tipo:"DM 66/2023", nome:"Strategie avanzate di Cybersicurezza per Insegnanti e Studenti", ore:12},
+      {tipo:"Ente Esterno", nome:"Scuola Futura – EAI Educazione Ambientale Innovativa", ore:18},
+      {tipo:"Ente Esterno", nome:"Scuola Futura – MOOC Misure di sicurezza cybersecurity dati digitalizzati", ore:24},
+      {tipo:"Ente Esterno", nome:"CREA – Coagulazione del latte", ore:3},
+    ]
+  },
+  {
+    nome: "Arcari Alessandra", cdc: "A012", ore: 24,
+    corsi: [
+      {tipo:"DM 65/2023", nome:"Corso Inglese B1 on-line", ore:24},
+    ]
+  },
+  {
+    nome: "Ballerini Alessia", cdc: "ADSS", ore: 12,
+    corsi: [
+      {tipo:"DM 66/2023", nome:"Strategie avanzate di Cybersicurezza per Insegnanti e Studenti", ore:12},
+    ]
+  },
+  {
+    nome: "Bonfiglio Giuseppa Grazia", cdc: "A-27", ore: 42,
+    corsi: [
+      {tipo:"DM 66/2023", nome:"Laboratorio Gamification", ore:12},
+      {tipo:"Ente Esterno", nome:"POLO INDIRE – Orientamenti: Secondaria di secondo grado (Corso avanzato)", ore:30},
+    ]
+  },
+  {
+    nome: "Cassarà Antonia", cdc: "A051", ore: 47,
+    corsi: [
+      {tipo:"DM 66/2023", nome:"Fondamenti dell'Intelligenza Artificiale per Insegnanti e Studenti", ore:14},
+      {tipo:"DM 66/2023", nome:"Laboratorio Gestione delle Emergenze Cyber e Risposta a Incidenti", ore:12},
+      {tipo:"DM 66/2023", nome:"Laboratorio Gamification", ore:12},
+      {tipo:"Ente Esterno", nome:"CREA-ZA – Progetto COFODOAGR: Le macchine operatrici per l'Agricoltura di Precisione", ore:3},
+      {tipo:"Ente Esterno", nome:"CREA-ZA – Progetto COFODOAGR: Utilizzo del software QGIS in agricoltura di precisione", ore:3},
+      {tipo:"Ente Esterno", nome:"CREA-ZA – Progetto COFODOAGR: Mappe di resa e prescrizione", ore:3},
+    ]
+  },
+  {
+    nome: "Cassinotti Silvia Anna", cdc: "A026", ore: 20,
+    corsi: [
+      {tipo:"DM 66/2023", nome:"Laboratorio Ambienti di Apprendimento (CANVA, PADLET, PREZI)", ore:12},
+      {tipo:"Ente Esterno", nome:"DeaScuola (corso ente esterno)", ore:8},
+    ]
+  },
+  {
+    nome: "Ceriani Francesca", cdc: "ADSS / A18", ore: 30,
+    corsi: [
+      {tipo:"Ente Esterno", nome:"Università Telematica IUL – Abilitazione su materia", ore:30},
+    ]
+  },
+  {
+    nome: "Clementi Elisa", cdc: "ADSS", ore: 187,
+    corsi: [
+      {tipo:"DM 66/2023", nome:"Fondamenti dell'Intelligenza Artificiale per Insegnanti e Studenti", ore:14},
+      {tipo:"DM 66/2023", nome:"Laboratorio Strumenti digitali per l'inclusione in classe", ore:12},
+      {tipo:"DM 66/2023", nome:"Laboratorio Gamification", ore:12},
+      {tipo:"DM 66/2023", nome:"Laboratorio Ambienti di Apprendimento (CANVA, PADLET, PREZI)", ore:12},
+      {tipo:"DM 65/2023", nome:"Corso Inglese B1 on-line", ore:24},
+      {tipo:"Ente Esterno", nome:"Polo Transizione Digitale Taranto – #M0.3 Ambienti 4.0: Nuove Metodologie e Strumenti (MOOC)", ore:24},
+      {tipo:"Ente Esterno", nome:"Polo Transizione Digitale Benevento – Mondi Immersivi e Realtà Virtuale", ore:25},
+      {tipo:"Ente Esterno", nome:"Polo Transizione Digitale Roma – #MOOC Itinerant EduLab: Applicativi per la didattica", ore:15},
+      {tipo:"Ente Esterno", nome:"Polo Nazionale – Formare le Comunità di Pratiche per l'Apprendimento", ore:25},
+      {tipo:"Ente Esterno", nome:"Polo Transizione Digitale Taranto – #M0.1 Eduverso: Il Metaverso per la Didattica (MOOC)", ore:24},
+    ]
+  },
+  {
+    nome: "Colombo Roberta", cdc: "A051", ore: 37,
+    corsi: [
+      {tipo:"DM 66/2023", nome:"Laboratorio Ambienti di Apprendimento (CANVA, PADLET, PREZI)", ore:12},
+      {tipo:"Ente Esterno", nome:"La fabbrica – Samsung", ore:25},
+    ]
+  },
+  {
+    nome: "Cordò Francesca", cdc: "ADSS", ore: 38,
+    corsi: [
+      {tipo:"DM 66/2023", nome:"Fondamenti dell'Intelligenza Artificiale per Insegnanti e Studenti", ore:14},
+      {tipo:"DM 66/2023", nome:"Strategie didattiche per l'educazione alla cittadinanza digitale", ore:12},
+      {tipo:"DM 66/2023", nome:"Laboratorio Gamification", ore:12},
+    ]
+  },
+  {
+    nome: "Corinti Beatrice", cdc: "ADSS", ore: 180,
+    corsi: [
+      {tipo:"Ente Esterno", nome:"Università di Cassino (30 CFU)", ore:180},
+    ]
+  },
+  {
+    nome: "Cortese Sebastiano", cdc: "ADSS", ore: 180,
+    corsi: [
+      {tipo:"Ente Esterno", nome:"Università di Macerata (30 CFU)", ore:180},
+    ]
+  },
+  {
+    nome: "Costa Fabio", cdc: "B011", ore: 24,
+    corsi: [
+      {tipo:"DM 66/2023", nome:"Strategie didattiche per l'educazione alla cittadinanza digitale", ore:12},
+      {tipo:"DM 66/2023", nome:"Laboratorio Storytelling tramite il podcast", ore:12},
+    ]
+  },
+  {
+    nome: "Crespi Massimiliano", cdc: "AB24 Inglese", ore: 65,
+    corsi: [
+      {tipo:"DM 66/2023", nome:"Strategie didattiche per l'educazione alla cittadinanza digitale", ore:12},
+      {tipo:"DM 66/2023", nome:"Laboratorio Ambienti di Apprendimento (CANVA, PADLET, PREZI)", ore:12},
+      {tipo:"Ente Esterno", nome:"MIM – Formare le Comunità di Pratiche per l'Apprendimento", ore:25},
+      {tipo:"Ente Esterno", nome:"MIM – Valorizzare le Comunità di Pratiche per l'Apprendimento", ore:12},
+      {tipo:"Ente Esterno", nome:"EYES UP – Università Bicocca", ore:4},
+    ]
+  },
+  {
+    nome: "D'Abramo Maria", cdc: "A052", ore: 25,
+    corsi: [
+      {tipo:"Ente Esterno", nome:"AID – Progetto solidale Tin Bòta: didattica inclusiva e apprendimento efficace", ore:25},
+    ]
+  },
+  {
+    nome: "D'Angelo Anna Elisa", cdc: "A046", ore: 26,
+    corsi: [
+      {tipo:"DM 65/2023", nome:"Corso Inglese B1 in presenza", ore:24},
+      {tipo:"Ente Esterno", nome:"Mondadori Education – Globalizzazione e politica economica nell'era Trump", ore:1},
+      {tipo:"Ente Esterno", nome:"Mondadori Education – La fine delle ideologie? La guerra fredda culturale vista dall'Occidente", ore:1},
+    ]
+  },
+  {
+    nome: "De Cecco Massimo Landi", cdc: "A051", ore: 48,
+    corsi: [
+      {tipo:"DM 65/2023", nome:"Corso Inglese B1 on-line", ore:24},
+      {tipo:"Ente Esterno", nome:"Polo Transizione Digitale Taranto – #M0.1 Eduverso: Il Metaverso per la Didattica (MOOC)", ore:24},
+    ]
+  },
+  {
+    nome: "De Giorgi Marina", cdc: "A012", ore: 26,
+    corsi: [
+      {tipo:"DM 66/2023", nome:"Fondamenti dell'Intelligenza Artificiale per Insegnanti e Studenti", ore:14},
+      {tipo:"DM 66/2023", nome:"Laboratorio Ambienti di Apprendimento (CANVA, PADLET, PREZI)", ore:12},
+    ]
+  },
+  {
+    nome: "Delle Donne Raffaella Maria Antonia", cdc: "AB22 Inglese", ore: 28,
+    corsi: [
+      {tipo:"DM 66/2023", nome:"Laboratorio Gestione delle Emergenze Cyber e Risposta a Incidenti", ore:12},
+      {tipo:"DM 66/2023", nome:"Laboratorio Ambienti di Apprendimento (CANVA, PADLET, PREZI)", ore:12},
+      {tipo:"Ente Esterno", nome:"MLA The Golden Globe srl – Christmas and New Year's in the English Classroom", ore:4},
+    ]
+  },
+  {
+    nome: "Di Meco Silvia", cdc: "A048", ore: 44,
+    corsi: [
+      {tipo:"Ente Esterno", nome:"Polo Didattica Digitale Reggio Emilia – MOOC Kit Didattici per Collaborare con le Tecnologie", ore:8},
+      {tipo:"Ente Esterno", nome:"Polo Transizione Digitale Taranto – #M0.3 Ambienti 4.0: Nuove Metodologie e Strumenti", ore:24},
+      {tipo:"Ente Esterno", nome:"AQUA CANOA & RAFTING – Corso aggiornamento RAFTING riconosciuto MIUR", ore:8},
+      {tipo:"Ente Esterno", nome:"FI Badminton / UST Milano – Insegnare il Badminton a Scuola", ore:4},
+    ]
+  },
+  {
+    nome: "Dino Giorgio", cdc: "A051", ore: 61,
+    corsi: [
+      {tipo:"DM 66/2023", nome:"Strategie avanzate di Cybersicurezza per Insegnanti e Studenti", ore:12},
+      {tipo:"DM 65/2023", nome:"Corso CLIL", ore:24},
+      {tipo:"Ente Esterno", nome:"Polo Nazionale – Formare le Comunità di Pratiche per l'Apprendimento", ore:25},
+    ]
+  },
+  {
+    nome: "Emmanuele Loretta", cdc: "ADSS", ore: 180,
+    corsi: [
+      {tipo:"Ente Esterno", nome:"Università di Cassino (30 CFU)", ore:180},
+    ]
+  },
+  {
+    nome: "Ferrantelli Bartolomeo", cdc: "ADSS", ore: 24,
+    corsi: [
+      {tipo:"DM 66/2023", nome:"Laboratorio Strumenti digitali per l'inclusione in classe", ore:12},
+      {tipo:"DM 66/2023", nome:"Laboratorio Ambienti di Apprendimento (CANVA, PADLET, PREZI)", ore:12},
+    ]
+  },
+  {
+    nome: "Ferrari Trecate Paolo Francesco", cdc: "A051", ore: 24,
+    corsi: [
+      {tipo:"DM 65/2023", nome:"Corso Inglese B1 in presenza", ore:24},
+    ]
+  },
+  {
+    nome: "Ferrise Filomena", cdc: "AD01", ore: 22,
+    corsi: [
+      {tipo:"DM 66/2023", nome:"Fondamenti dell'Intelligenza Artificiale per Insegnanti e Studenti", ore:14},
+      {tipo:"Ente Esterno", nome:"TuttoScuola – Montessori", ore:2},
+      {tipo:"Ente Esterno", nome:"C2GROUP – Didattica all'azione", ore:2},
+      {tipo:"Ente Esterno", nome:"CampuStore – Novità nello zaino digitale", ore:2},
+      {tipo:"Ente Esterno", nome:"CampuStore – A lezione nell'aula immersiva", ore:1},
+      {tipo:"Ente Esterno", nome:"CampuStore – Reinventare l'innovazione", ore:1},
+    ]
+  },
+  {
+    nome: "Fiorino Raffaella", cdc: "A026", ore: 0,
+    corsi: []
+  },
+  {
+    nome: "Fittipaldi Stefania", cdc: "A050", ore: 34,
+    corsi: [
+      {tipo:"DM 65/2023", nome:"Corso CLIL", ore:24},
+      {tipo:"Ente Esterno", nome:"Polo Didattica Digitale Legnano – MIIS044009", ore:10},
+    ]
+  },
+  {
+    nome: "Fusani Laura Ada", cdc: "B011", ore: 0,
+    corsi: []
+  },
+  {
+    nome: "Fusetti Lisa", cdc: "A050", ore: 24,
+    corsi: [
+      {tipo:"DM 65/2023", nome:"Corso CLIL", ore:24},
+    ]
+  },
+  {
+    nome: "Galatis Luca", cdc: "A034", ore: 0,
+    corsi: []
+  },
+  {
+    nome: "Galletta Maria", cdc: "A046", ore: 0,
+    corsi: []
+  },
+  {
+    nome: "Genovese Elvira", cdc: "ADSS", ore: 32,
+    corsi: [
+      {tipo:"DM 66/2023", nome:"Fondamenti dell'Intelligenza Artificiale per Insegnanti e Studenti", ore:14},
+      {tipo:"DM 66/2023", nome:"Strategie avanzate di Cybersicurezza per Insegnanti e Studenti", ore:12},
+      {tipo:"Ente Esterno", nome:"EFT Lombardia – Pronti per le STEM! Competenze e strumenti per i referenti di domani", ore:6},
+    ]
+  },
+  {
+    nome: "Impallomeni Cinzia", cdc: "ADSS", ore: 66,
+    corsi: [
+      {tipo:"DM 65/2023", nome:"Corso Inglese B2 in presenza", ore:24},
+      {tipo:"Ente Esterno", nome:"Futura PNRR – Orientamenti Livello Base (Polo INDIRE)", ore:30},
+      {tipo:"Ente Esterno", nome:"Futura PNRR – Intelligenza Artificiale", ore:12},
+    ]
+  },
+  {
+    nome: "L'Episcopo Gianna", cdc: "ADSS", ore: 24,
+    corsi: [
+      {tipo:"DM 65/2023", nome:"Corso CLIL", ore:24},
+    ]
+  },
+  {
+    nome: "Minnaja Renata", cdc: "A051", ore: 57,
+    corsi: [
+      {tipo:"DM 65/2023", nome:"Corso Inglese B1 on-line", ore:24},
+      {tipo:"Ente Esterno", nome:"ASPROMIELE – Analisi sensoriale del miele, Primo livello", ore:30},
+      {tipo:"Ente Esterno", nome:"Aggiornamento interno – Gestione Container Idroponico e Aeroponico", ore:3},
+    ]
+  },
+  {
+    nome: "Monte Marilena", cdc: "A27", ore: 40,
+    corsi: [
+      {tipo:"DM 66/2023", nome:"Fondamenti dell'Intelligenza Artificiale per Insegnanti e Studenti", ore:14},
+      {tipo:"DM 65/2023", nome:"Corso Inglese B1 in presenza", ore:24},
+      {tipo:"Ente Esterno", nome:"e-Campus Università – Webinar Figura del Tutor scolastico", ore:2},
+    ]
+  },
+  {
+    nome: "Mulé Margherita", cdc: "ADSS", ore: 60,
+    corsi: [
+      {tipo:"DM 66/2023", nome:"Laboratorio Strumenti digitali per l'inclusione in classe", ore:12},
+      {tipo:"DM 66/2023", nome:"Laboratorio Gamification", ore:12},
+      {tipo:"DM 65/2023", nome:"Corso Inglese B1 in presenza", ore:24},
+      {tipo:"Ente Esterno", nome:"INDIRE – Tutoraggio docenti neo-assunti (periodo di formazione e prova)", ore:12},
+    ]
+  },
+  {
+    nome: "Murasso Paolina", cdc: "AS24", ore: 26,
+    corsi: [
+      {tipo:"DM 66/2023", nome:"Fondamenti dell'Intelligenza Artificiale per Insegnanti e Studenti", ore:14},
+      {tipo:"DM 66/2023", nome:"Strategie avanzate di Cybersicurezza per Insegnanti e Studenti", ore:12},
+    ]
+  },
+  {
+    nome: "Musazzi Anna Lisa", cdc: "A-22 (ex AB24) Inglese", ore: 34,
+    corsi: [
+      {tipo:"DM 66/2023", nome:"Laboratorio Gestione delle Emergenze Cyber e Risposta a Incidenti", ore:12},
+      {tipo:"DM 66/2023", nome:"Laboratorio Ambienti di Apprendimento (CANVA, PADLET, PREZI)", ore:12},
+      {tipo:"Ente Esterno", nome:"FISAL – Aggiornamento Formazione Specifica Lavoratori", ore:6},
+      {tipo:"Ente Esterno", nome:"DeA Scuola – Riconoscere le fragilità e supportarle", ore:1},
+      {tipo:"Ente Esterno", nome:"Mondadori Education – AI generativa e coding nella Didattica", ore:1},
+      {tipo:"Ente Esterno", nome:"Mondadori Education – Black Lives Matter and Romantic Poets on Slavery", ore:1},
+      {tipo:"Ente Esterno", nome:"Mondadori Education – Lesson Hacks to make your classes more productive", ore:1},
+    ]
+  },
+  {
+    nome: "Pagliuca Iole", cdc: "A034 Chimica", ore: 26,
+    corsi: [
+      {tipo:"DM 66/2023", nome:"Fondamenti dell'Intelligenza Artificiale per Insegnanti e Studenti", ore:14},
+      {tipo:"DM 66/2023", nome:"Strategie avanzate di Cybersicurezza per Insegnanti e Studenti", ore:12},
+    ]
+  },
+  {
+    nome: "Petrolo Guido", cdc: "B011", ore: 0,
+    corsi: []
+  },
+  {
+    nome: "Raimondi Enrico", cdc: "A037", ore: 26,
+    corsi: [
+      {tipo:"DM 66/2023", nome:"Fondamenti dell'Intelligenza Artificiale per Insegnanti e Studenti", ore:14},
+      {tipo:"DM 66/2023", nome:"Strategie avanzate di Cybersicurezza per Insegnanti e Studenti", ore:12},
+    ]
+  },
+  {
+    nome: "Rancilio Emanuela", cdc: "A026", ore: 121,
+    corsi: [
+      {tipo:"DM 66/2023", nome:"Laboratorio Ambienti di Apprendimento (CANVA, PADLET, PREZI)", ore:12},
+      {tipo:"DM 65/2023", nome:"Corso Inglese B1 in presenza", ore:24},
+      {tipo:"Ente Esterno", nome:"MIM – Formare le Comunità di Pratiche per l'Apprendimento", ore:25},
+      {tipo:"Ente Esterno", nome:"MIM – Valorizzare le Comunità di Pratiche per l'Apprendimento", ore:12},
+      {tipo:"Ente Esterno", nome:"MIM – Intelligenza Artificiale per la Didattica", ore:20},
+      {tipo:"Ente Esterno", nome:"Università degli Studi di Milano – Giochi e Pieghe IV edizione", ore:24},
+      {tipo:"Ente Esterno", nome:"Università Bicocca – Eyes Up", ore:4},
+    ]
+  },
+  {
+    nome: "Ronzello Giuliana", cdc: "A034", ore: 36,
+    corsi: [
+      {tipo:"DM 66/2023", nome:"Strategie avanzate di Cybersicurezza per Insegnanti e Studenti", ore:12},
+      {tipo:"DM 65/2023", nome:"Corso Inglese B1 in presenza", ore:24},
+    ]
+  },
+  {
+    nome: "Rotiroti Francesco", cdc: "A051", ore: 48,
+    corsi: [
+      {tipo:"DM 66/2023", nome:"Strategie avanzate di Cybersicurezza per Insegnanti e Studenti", ore:12},
+      {tipo:"DM 66/2023", nome:"Strategie didattiche per l'educazione alla cittadinanza digitale", ore:12},
+      {tipo:"Ente Esterno", nome:"MIM – Strategie avanzate di Cybersicurezza per Insegnanti e Studenti", ore:12},
+      {tipo:"Ente Esterno", nome:"MIM – Strategie didattiche per l'educazione alla Cittadinanza Digitale", ore:12},
+    ]
+  },
+  {
+    nome: "Russo Angela", cdc: "A012", ore: 57,
+    corsi: [
+      {tipo:"DM 66/2023", nome:"Laboratorio Ambienti di Apprendimento (CANVA, PADLET, PREZI)", ore:12},
+      {tipo:"Ente Esterno", nome:"Polo INDIRE – Orientamenti Livello Base: Secondaria di secondo grado", ore:30},
+      {tipo:"Ente Esterno", nome:"EFT Lazio – Lab. Apprendimento Digitale: IA, Cittadinanza, VR/AR e Streaming", ore:15},
+    ]
+  },
+  {
+    nome: "Sala Elena", cdc: "A012", ore: 65,
+    corsi: [
+      {tipo:"DM 66/2023", nome:"Laboratorio Storytelling tramite il podcast", ore:12},
+      {tipo:"DM 65/2023", nome:"Corso Inglese B2 in presenza", ore:24},
+      {tipo:"Ente Esterno", nome:"Università Cattolica del Sacro Cuore di Milano – Comprendere il Medio Oriente", ore:29},
+    ]
+  },
+  {
+    nome: "Sanfilippo Valerio", cdc: "A051", ore: 24,
+    corsi: [
+      {tipo:"Ente Esterno", nome:"Corso sicurezza piattaforme elevabili", ore:8},
+      {tipo:"Ente Esterno", nome:"Corso utilizzatore fitofarmaci", ore:12},
+      {tipo:"Ente Esterno", nome:"Corso di guida trattori agricoli", ore:4},
+    ]
+  },
+  {
+    nome: "Sannino Francesca", cdc: "A034", ore: 43,
+    corsi: [
+      {tipo:"DM 66/2023", nome:"Fondamenti dell'Intelligenza Artificiale per Insegnanti e Studenti", ore:14},
+      {tipo:"DM 66/2023", nome:"Strategie avanzate di Cybersicurezza per Insegnanti e Studenti", ore:12},
+      {tipo:"Ente Esterno", nome:"AID – XVIII Congresso Nazionale AID", ore:7},
+      {tipo:"Ente Esterno", nome:"Liceo Manzoni Milano – L'IA nell'attuale dibattito filosofico, giuridico e artistico", ore:8},
+      {tipo:"Ente Esterno", nome:"TuttoScuola – Come la bellezza può educare e ispirare i giovani", ore:2},
+    ]
+  },
+  {
+    nome: "Sascaro Massimiliano", cdc: "A-48", ore: 9,
+    corsi: [
+      {tipo:"Ente Esterno", nome:"DeA Scuola – Traslocazioni e andature", ore:1},
+      {tipo:"Ente Esterno", nome:"Liceo Galilei – Adapted Sports and Inclusion at School", ore:4},
+      {tipo:"Ente Esterno", nome:"CONI-FIPAV – I fogli gara", ore:2},
+      {tipo:"Ente Esterno", nome:"CONI-FIPAV – La costruzione del cambio palla nella pallavolo giovanile", ore:2},
+    ]
+  },
+  {
+    nome: "Sergio Degli Esposti", cdc: "ADSS", ore: 26,
+    corsi: [
+      {tipo:"DM 66/2023", nome:"Fondamenti dell'Intelligenza Artificiale per Insegnanti e Studenti", ore:14},
+      {tipo:"DM 66/2023", nome:"Strategie didattiche per l'educazione alla cittadinanza digitale", ore:12},
+    ]
+  },
+  {
+    nome: "Sestito Silvana", cdc: "B011", ore: 20,
+    corsi: [
+      {tipo:"Ente Esterno", nome:"CREA (corso ente esterno)", ore:12},
+      {tipo:"Ente Esterno", nome:"Campus Store (corso ente esterno)", ore:8},
+    ]
+  },
+  {
+    nome: "Soresini Mattia", cdc: "B011", ore: 0,
+    corsi: []
+  },
+  {
+    nome: "Stivala Pasquale", cdc: "B011", ore: 32,
+    corsi: [
+      {tipo:"Ente Esterno", nome:"Scuola Futura – #M0.3 Ambienti 4.0: Nuove Metodologie e Strumenti (MOOC)", ore:24},
+      {tipo:"Ente Esterno", nome:"Scuola Futura – MOOC Kit Didattici per Collaborare con le Tecnologie", ore:8},
+    ]
+  },
+  {
+    nome: "Teresi Maria Carla", cdc: "A050", ore: 0,
+    corsi: []
+  },
+  {
+    nome: "Tessarollo Mara", cdc: "A050", ore: 0,
+    corsi: []
+  },
+  {
+    nome: "Tomasino Letizia", cdc: "ADSS", ore: 63,
+    corsi: [
+      {tipo:"Ente Esterno", nome:"Polo Didattica Digitale Reggio Emilia (corso)", ore:8},
+      {tipo:"Ente Esterno", nome:"Polo Didattica Digitale Roma Galilei (corso)", ore:25},
+      {tipo:"Ente Esterno", nome:"Certipass – DigComp 2.2", ore:30},
+    ]
+  },
+  {
+    nome: "Trieste Michele", cdc: "A37", ore: 26,
+    corsi: [
+      {tipo:"DM 66/2023", nome:"Fondamenti dell'Intelligenza Artificiale per Insegnanti e Studenti", ore:14},
+      {tipo:"DM 66/2023", nome:"Strategie avanzate di Cybersicurezza per Insegnanti e Studenti", ore:12},
+    ]
+  },
+  {
+    nome: "Trimboli Giosafatte", cdc: "ADSS / A046", ore: 32,
+    corsi: [
+      {tipo:"DM 66/2023", nome:"Strategie didattiche per l'educazione alla cittadinanza digitale", ore:12},
+      {tipo:"Ente Esterno", nome:"MIIS08300X – Strategie didattiche per l'Educazione alla Cittadinanza", ore:12},
+      {tipo:"Ente Esterno", nome:"IIS Inveruno – Formazione specifica rischio basso (sicurezza)", ore:4},
+      {tipo:"Ente Esterno", nome:"IIS Inveruno – La Sicurezza sul Lavoro nell'Ambiente Scuola", ore:4},
+    ]
+  },
+  {
+    nome: "Urso Lilia", cdc: "AD00", ore: 83,
+    corsi: [
+      {tipo:"DM 66/2023", nome:"Fondamenti dell'Intelligenza Artificiale per Insegnanti e Studenti", ore:14},
+      {tipo:"DM 66/2023", nome:"Strategie didattiche per l'educazione alla cittadinanza digitale", ore:12},
+      {tipo:"Ente Esterno", nome:"Polo INDIRE – Orientamenti Livello Base: Secondaria di secondo grado", ore:30},
+      {tipo:"Ente Esterno", nome:"Polo Didattica Digitale Busto Arsizio – MOOC Includi@mo con l'IA", ore:20},
+      {tipo:"Ente Esterno", nome:"Flipped Training (corso ente esterno)", ore:4},
+      {tipo:"Ente Esterno", nome:"TuttoScuola – Scintille di bellezza: come la bellezza può educare", ore:2},
+      {tipo:"Ente Esterno", nome:"Rizzoli Education – Integrazione strumenti IA per coinvolgere la classe", ore:1},
+    ]
+  },
+  {
+    nome: "Venegoni Alberto", cdc: "A34", ore: 24,
+    corsi: [
+      {tipo:"DM 65/2023", nome:"Corso Inglese B1 in presenza", ore:24},
+    ]
+  },
+  {
+    nome: "Vignati Elena", cdc: "A012", ore: 0,
+    corsi: []
+  },
+  {
+    nome: "Viola Stefania", cdc: "A050", ore: 12,
+    corsi: [
+      {tipo:"DM 66/2023", nome:"Laboratorio Strumenti digitali per l'inclusione in classe", ore:12},
+    ]
+  },
+  {
+    nome: "Virardi Mariangela", cdc: "A026", ore: 24,
+    corsi: [
+      {tipo:"DM 65/2023", nome:"Corso Inglese B1 in presenza", ore:24},
+    ]
+  },
+  {
+    nome: "Zappalà Rosa", cdc: "A037", ore: 0,
+    corsi: []
+  },
+];
+
+// ── Helpers ──
+function tagHtml(tipo) {
+  if (tipo === 'DM 66/2023') return `<span class="tag tag-dm66">DM 66</span>`;
+  if (tipo === 'DM 65/2023') return `<span class="tag tag-dm65">DM 65</span>`;
+  return `<span class="tag tag-ext">Ente Esterno</span>`;
+}
+
+function cardHtml(d) {
+  const pct = d.ore > 0 ? Math.min((d.ore / MAX_ORE) * 100, 100) : 0;
+  const numClass = d.ore === 0 ? 'zero' : '';
+  const corsiHtml = d.corsi.length === 0
+    ? `<p class="no-course">⚠ Nessun corso formativo dichiarato per questo docente.</p>`
+    : `<table class="courses-table">
+        <thead><tr>
+          <th>Ambito</th>
+          <th>Denominazione corso / ente erogatore</th>
+          <th style="text-align:right">Ore</th>
+        </tr></thead>
+        <tbody>
+          ${d.corsi.map(c => `<tr>
+            <td>${tagHtml(c.tipo)}</td>
+            <td>${c.nome}</td>
+            <td class="ore-cell">${c.ore > 0 ? c.ore + ' h' : '–'}</td>
+          </tr>`).join('')}
+        </tbody>
+      </table>`;
+
+  return `<div class="card" data-nome="${d.nome}" data-cdc="${d.cdc}" data-ore="${d.ore}"
+             data-tipi="${d.corsi.map(c=>c.tipo).join('|')}"
+             data-corsi="${d.corsi.map(c=>c.nome).join(' ').toLowerCase()}">
+    <div class="card-header" onclick="toggleCard(this.parentElement)">
+      <div class="teacher-info">
+        <div class="teacher-name">${d.nome}</div>
+        <div class="teacher-meta">CDC: ${d.cdc}</div>
+      </div>
+      <div class="bar-container">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:4px;text-align:right">${d.corsi.length} corso/i</div>
+        <div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div>
+      </div>
+      <div class="hours-badge">
+        <div>
+          <div class="hours-num ${numClass}">${d.ore}</div>
+          <div class="hours-label">ore tot.</div>
+        </div>
+      </div>
+      <div class="chevron">▾</div>
+    </div>
+    <div class="card-body">${corsiHtml}</div>
+  </div>`;
+}
+
+function toggleCard(card) {
+  card.classList.toggle('open');
+}
+
+// ── Ranking ──
+function buildRanking() {
+  const top = [...docenti].sort((a,b) => b.ore - a.ore).slice(0, 10);
+  const maxOre = top[0].ore;
+  document.getElementById('ranking').innerHTML = top.map((d, i) => {
+    const pct = (d.ore / maxOre * 100).toFixed(0);
+    return `<div class="rank-row">
+      <span class="rank-pos ${i < 3 ? 'top' : ''}">${i < 3 ? ['🥇','🥈','🥉'][i] : `#${i+1}`}</span>
+      <span class="rank-name">${d.nome} <span style="color:var(--muted);font-size:12px">– ${d.cdc}</span></span>
+      <div class="rank-bar-wrap">
+        <div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div>
+      </div>
+      <span class="rank-ore">${d.ore} h</span>
+    </div>`;
+  }).join('');
+}
+
+// ── Render list ──
+let currentFilter = 'all';
+let currentSort = 'alpha';
+let currentSearch = '';
+
+function renderList() {
+  let list = [...docenti];
+
+  // Filter
+  if (currentFilter === 'dm66') list = list.filter(d => d.tipi && d.tipi.includes('DM 66'));
+  if (currentFilter === 'dm65') list = list.filter(d => d.tipi && d.tipi.includes('DM 65'));
+  if (currentFilter === 'ext')  list = list.filter(d => d.corsi.some(c => c.tipo === 'Ente Esterno'));
+  if (currentFilter === 'zero') list = list.filter(d => d.ore === 0);
+  if (currentFilter === 'dm66') list = list.filter(d => d.corsi.some(c => c.tipo === 'DM 66/2023'));
+  if (currentFilter === 'dm65') list = list.filter(d => d.corsi.some(c => c.tipo === 'DM 65/2023'));
+
+  // Search
+  if (currentSearch.length > 1) {
+    const q = currentSearch.toLowerCase();
+    list = list.filter(d =>
+      d.nome.toLowerCase().includes(q) ||
+      d.cdc.toLowerCase().includes(q) ||
+      d.corsi.some(c => c.nome.toLowerCase().includes(q) || c.tipo.toLowerCase().includes(q))
+    );
+  }
+
+  // Sort
+  if (currentSort === 'alpha')    list.sort((a,b) => a.nome.localeCompare(b.nome));
+  if (currentSort === 'ore-desc') list.sort((a,b) => b.ore - a.ore);
+  if (currentSort === 'ore-asc')  list.sort((a,b) => a.ore - b.ore);
+
+  document.getElementById('docenti-list').innerHTML =
+    list.length ? list.map(cardHtml).join('') : '<p style="color:var(--muted);padding:20px 0">Nessun docente trovato.</p>';
+}
+
+// ── Events ──
+document.getElementById('search').addEventListener('input', e => {
+  currentSearch = e.target.value;
+  renderList();
+});
+
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentFilter = btn.dataset.filter;
+    renderList();
+  });
+});
+
+document.getElementById('sort').addEventListener('change', e => {
+  currentSort = e.target.value;
+  renderList();
+});
+
+buildRanking();
+renderList();
+</script>
+</body>
+</html>
